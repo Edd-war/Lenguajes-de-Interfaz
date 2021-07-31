@@ -1,0 +1,82 @@
+TITLE Busqueda_Binaria
+
+include Irvine32.inc
+
+.data
+
+	; DECLARACIONES DE VARIABLES DE OPCIÓN 1
+	resulMulti BYTE "La multiplicacion es: ", 0
+	resulSuma BYTE "La suma es: ", 0
+	tempo SDWORD ?
+	ref SDWORD 2
+	suma SDWORD 0
+	multi SDWORD 1
+	
+	; DECLARACIONES GLOBALES
+	arreglo_cad byte "Se tiene el siguiente arreglo: ", 0
+	salto_de_carro BYTE " ", 0ah
+			byte " ",0
+	
+	mjsOpcion1 BYTE "Elegiste la opcion 1",0AH
+				BYTE " ",0
+	mjSalir BYTE "Hasta luego...",0AH
+			BYTE " ",0
+	arreglo SDWORD 31,38,42,65,25,22
+	tamArreglo = ($-arreglo) / TYPE arreglo
+	
+.code
+main proc
+	mov suma, 0
+	mov multi, 1
+	mov edx, offset mjsOpcion1
+	call writestring
+
+	mov esi, 0
+		beginwhile:
+
+			cmp esi, tamArreglo
+			jnc endwhile
+			mov eax, arreglo[esi*4]
+			mov tempo, eax
+			inc esi
+
+			cdq
+			idiv ref
+			cmp edx, 0
+			jz pares	;impares
+				mov eax, suma
+				add eax, tempo
+				mov suma, eax
+				;call WriteInt
+				jmp beginwhile
+				pares:	;pares
+				mov eax, multi
+				imul tempo
+				mov multi, eax
+				;call WriteInt
+			jmp beginwhile
+
+		endwhile:
+	mov edx, OFFSET resulSuma
+	call WriteString 
+	mov eax, suma
+	call WriteInt	
+	mov edx, offset salto_de_carro
+	call writestring
+
+	mov edx, OFFSET resulMulti
+	call WriteString
+	mov eax, multi
+	call WriteInt	
+	mov edx, offset salto_de_carro
+	call writestring
+	mov edx, offset salto_de_carro
+	call writestring
+	mov edx, offset mensaje4
+	call writestring
+	mov edx, offset salto_de_carro
+	call writestring
+	call readkey
+	ret
+main endp
+end main

@@ -1,0 +1,44 @@
+TITLE Busqueda_Binaria
+
+include Irvine32.inc
+
+.data
+	mensaje1 BYTE "Elegiste la opcion 2",0
+	mensaje2 BYTE "Ingrese el valor de la busqueda a continuacion: ", 0
+	resultEncontrado BYTE "Encontrado", 0
+	resultNoEncontrado BYTE "No Encontrado", 0
+	busqueda SDWORD ?
+
+	arreglo SDWORD 11,18,22,45,5,2
+	tamArreglo = ($-arreglo) / TYPE arreglo
+	
+.code
+main proc
+	mov esi, 0
+
+	mov edx, offset mensaje1
+	call writestring
+	
+	call clrscr
+	mov edx, offset mensaje2
+	call writestring
+	call ReadInt
+	mov busqueda, eax
+
+	CICLO_ARREGLO:
+	mov eax, arreglo[esi*4]
+	mov ebx, busqueda
+	cmp eax, ebx
+	jz BINGO
+		cmp esi, tamArreglo
+		inc esi
+		jc CICLO_ARREGLO
+		mov edx, offset resultNoEncontrado
+		call writestring
+		ret
+	BINGO:
+	mov edx, offset resultEncontrado
+	call writestring
+	ret 
+main endp
+end main
