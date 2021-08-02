@@ -1,0 +1,99 @@
+TITLE Ordenamiento_por_metodo_burbuja
+
+include Irvine32.inc
+
+.data
+	mensaje1 BYTE "Elegiste la opcion 1",0
+	mensaje2 BYTE "Ingresa 1ra cadena: ",0
+	mensaje3 BYTE "Ingresa 2da cadena: ",0
+	mensaje4 BYTE "NO SON IGUALES ",0
+	mensaje5 BYTE "SI SON IGUALES",0
+	index sdword 0
+	MAX = 80
+	buffer1 BYTE MAX+1 DUP (?)
+	buffer2 BYTE MAX+1 DUP (?)
+	tamBuffer SDWORD ?
+	cadena1 sdword ?
+	cadena2 sdword ?
+	salto_de_carro BYTE " ", 0ah
+					BYTE " ", 0
+;	index SDWORD 0
+	;arreglo SDWORD 11,18,22,45,5,2
+	;tamArreglo = ($-arreglo) / TYPE arreglo
+	
+.code
+main proc
+		
+	mov esi, 0
+	mov edx, offset mensaje1
+	call writestring
+	mov edx, offset salto_de_carro
+	call writestring
+
+	mov edx, offset mensaje2
+	call writestring
+	mov edx, offset buffer1[esi*4]
+	mov ecx, lengthof buffer1
+	call readstring
+	mov cadena1, edx
+	;call writeString
+	inc esi
+	;mov edx, offset buffer1[esi*4]
+	mov cadena1, edx
+
+	mov tamBuffer, ecx
+
+	
+	mov edx, offset salto_de_carro
+	call writestring
+
+	mov edx, offset mensaje3
+	call writestring
+	mov edx, offset buffer1
+	mov ecx, lengthof buffer1
+	call readString
+	mov cadena2, edx
+	;call writeString
+
+
+	mov edx, offset salto_de_carro
+	call writestring
+
+	;tamBuffer1 = ($-buffer1) / TYPE buffer1
+	;tamBuffer2 = ($-buffer2) / TYPE buffer2
+
+	cmp ecx, tamBuffer
+	jz pueden_ser_iguales
+	no_son_iguales:
+	mov edx, offset mensaje4
+	call writestring
+	mov edx, offset salto_de_carro
+	call writestring
+	mov edx, offset salto_de_carro
+	call writestring
+	call readkey
+	ret
+
+	pueden_ser_iguales:
+	;cmp esi, tamBuffer
+	;jnc si_son_iguales
+	;mov esi, index
+	;mov eax, offset buffer1[esi*4]
+	;mov ebx, offset buffer2[esi*4]
+	mov eax, cadena1
+	mov ebx, cadena2
+	cmp eax, ebx
+	;inc esi
+	;jz pueden_ser_iguales
+	jnz no_son_iguales
+	si_son_iguales:
+	mov edx, offset mensaje5
+	call writestring
+	mov edx, offset salto_de_carro
+	call writestring
+	mov edx, offset salto_de_carro
+	call writestring
+	call readkey
+	ret 
+main endp
+end main

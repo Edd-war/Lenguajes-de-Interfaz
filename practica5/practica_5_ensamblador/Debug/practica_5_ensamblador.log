@@ -1,0 +1,18 @@
+﻿  Assembling main.asm...
+main.asm(173): error A2005: symbol redefinition : mensaje1
+main.asm(178): error A2005: symbol redefinition : mensaje3
+main.asm(180): error A2005: symbol redefinition : mensaje4
+main.asm(215): error A2070: invalid instruction operands
+main.asm(215): error A2070: invalid instruction operands
+main.asm(223): error A2005: symbol redefinition : CICLO1
+main.asm(153): error A2006: undefined symbol : cadena1
+main.asm(212): error A2006: undefined symbol : IMPRIME_ARRAY_INICIAL
+main.asm(215): error A2006: undefined symbol : opc1mensaje1
+main.asm(216): error A2006: undefined symbol : IMPRIME_ARRAY_INICIAL
+main.asm(219): error A2006: undefined symbol : cadena1
+main.asm(219): error A2006: undefined symbol : tamCadena
+main.asm(219): error A2006: undefined symbol : tamCadena
+main.asm(220): error A2006: undefined symbol : IMPRIME_ARRAY_INICIAL
+main.asm(224): error A2006: undefined symbol : IMPRIME_ARRAY_INICIAL
+main.asm(142): error A2084: constant value too large
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Microsoft\VC\v160\BuildCustomizations\masm.targets(70,5): error MSB3721: The command "ml.exe /c /nologo /Zi /Fo"Debug\main.obj" /I "C:\irvine" /W3 /errorReport:prompt  /Tamain.asm" exited with code 1.
