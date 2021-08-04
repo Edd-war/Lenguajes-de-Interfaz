@@ -225,7 +225,7 @@ ENDM
 				BYTE " ",0
 	mjSalir BYTE "Hasta luego...",0AH
 			BYTE " ",0
-	arreglo SDWORD 31,38,42,65,25,22
+	arreglo SDWORD 9,5,4,7,2,8,1,3,6
 	tamArreglo = ($-arreglo) / TYPE arreglo
 	
 .code
