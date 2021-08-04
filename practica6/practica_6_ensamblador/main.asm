@@ -10,9 +10,9 @@ INCLUDE Irvine32.inc
 	abiertos sdword 0
 	cerrados sdword 0
 	;parentesis byte "(()()()()) (((()))) (()((())()))", 0
-	parentesis byte "((((((())())) (()()(()", 0
+	;parentesis byte "((((((())())) (()()(()", 0
 	;parentesis byte ")(", 0
-	;parentesis byte "(() ()(", 0
+	parentesis byte "(() ()(", 0
 	tamCadParentesis = ($-parentesis) - 1
 
 
