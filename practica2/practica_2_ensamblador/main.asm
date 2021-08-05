@@ -5,10 +5,13 @@ include Irvine32.inc
 .data
 
 	; DECLARACIONES DE VARIABLES DE OPCIÓN 1
-	opc1mensaje1 BYTE "Elegiste la opcion 1: ", 0
-	opc1mensaje2 BYTE "Ingresa un numero para calcular su factorial a continuacion: ", 0
-	opc1mensaje3 BYTE "El valor factorial es: ", 0
+	opc2mensaje1 BYTE "Elegiste la opcion 2: ", 0
+	opc2mensaje2 BYTE "Ingresa el index para calcular hasta su valor en la serie FIBONACCI a continuacion: ", 0
+	opc2mensaje3 BYTE "Serie FIBONACCI hasta INDEX: ", 0
 	uno sdword 1
+	cero sdword 0
+	serie sdword ?
+	index sdword 0
 
 	; DECLARACIONES GLOBALES
 	salto_de_carro byte " ", 0ah
@@ -17,40 +20,49 @@ include Irvine32.inc
 	
 .code
 main proc
-	mov edx, offset opc1mensaje1
+	mov esi, 0
+	mov eax, cero
+	mov serie[esi], eax
+	inc esi
+	mov eax, uno
+	mov serie[esi], eax
+	
+	mov edx, offset opc2mensaje1
 	call writestring
 	mov edx, offset salto_de_carro
 	call writestring
 
-	mov edx, offset opc1mensaje2
+	mov edx, offset opc2mensaje2
 	call writestring
 	call readint
-	mov esi, eax
-	cmp esi, 0
-	jz cero_factorial
+	mov index, eax
+	mov esi, 0
+	cmp esi, index	
+	jz salida_opc2
 
-	cmp esi, uno
-	jz uno_factorial
+	inicia_serie:
+	mov eax, serie[esi]
+	inc esi
+	add eax, serie[esi]
+	jc inicia_serie
 
-	inicia_ciclo:
-	dec esi	
-	imul esi
-	cmp uno, esi
-	jc inicia_ciclo
-	jmp salida_opc1
-
-	uno_factorial:
-	mov eax, 1
-	jmp salida_opc1
-
-	cero_factorial:
-	mov eax, 0
-	jmp salida_opc1
-
-	salida_opc1:
-	mov edx, offset opc1mensaje3
+	mov eax, 
+	dec esi
+	jmp inicia_serie
+	
+	salida_opc2:
+	mov esi, 0
+	mov edx, offset opc2mensaje3
 	call writestring
+
+	inicia_impresion:
+	mov eax, serie[esi]
 	call writeint
+	inc esi
+	cmp esi, ecx
+	jc inicia_impresion
+
+
 	mov edx, offset salto_de_carro
 	call writestring
 	mov edx, offset salto_de_carro
