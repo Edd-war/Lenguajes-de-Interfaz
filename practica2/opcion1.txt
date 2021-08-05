@@ -1,0 +1,62 @@
+TITLE Valor_Factorial
+
+include Irvine32.inc
+
+.data
+
+	; DECLARACIONES DE VARIABLES DE OPCIÓN 1
+	opc1mensaje1 BYTE "Elegiste la opcion 1: ", 0
+	opc1mensaje2 BYTE "Ingresa un numero para calcular su factorial a continuacion: ", 0
+	opc1mensaje3 BYTE "El valor factorial es: ", 0
+	uno sdword 1
+
+	; DECLARACIONES GLOBALES
+	salto_de_carro byte " ", 0ah
+					byte " ", 0
+
+	
+.code
+main proc
+	mov edx, offset opc1mensaje1
+	call writestring
+	mov edx, offset salto_de_carro
+	call writestring
+
+	mov edx, offset opc1mensaje2
+	call writestring
+	call readint
+	mov esi, eax
+	cmp esi, 0
+	jz cero_factorial
+
+	cmp esi, uno
+	jz uno_factorial
+
+	inicia_ciclo:
+	dec esi	
+	imul esi
+	cmp uno, esi
+	jc inicia_ciclo
+	jmp salida_opc1
+
+	uno_factorial:
+	mov eax, 1
+	jmp salida_opc1
+
+	cero_factorial:
+	mov eax, 0
+	jmp salida_opc1
+
+	salida_opc1:
+	mov edx, offset opc1mensaje3
+	call writestring
+	call writeint
+	mov edx, offset salto_de_carro
+	call writestring
+	mov edx, offset salto_de_carro
+	call writestring
+	call readkey
+	ret
+
+main endp
+end main
