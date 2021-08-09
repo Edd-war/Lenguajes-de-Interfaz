@@ -27,7 +27,7 @@ endm
     sub al, 30h
     mov base, al
     mov bl, al
-    imul bl
+    mul bl
     mov longitud, ax
     
     imprime_cuadro:
@@ -42,7 +42,7 @@ endm
     mov al, base
     inc al
     mov bl, 2
-    idiv bl
+    div bl
     mov si, ax
     
     mov bx, 0
