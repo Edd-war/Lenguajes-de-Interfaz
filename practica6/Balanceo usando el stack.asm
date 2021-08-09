@@ -4,8 +4,8 @@
 LF equ 10
 OD equ 13
 
-    abierto db 28h
-	cerrado db 29h 
+ 
+	basura db 0ah, 0dh, 'Esto es basura', '$'
 	no_bal db 0ah, 0dh, 'Parentesis NO balanceados', '$'
 	bal db 0ah, 0dh, 'Parentesis SI balanceados', '$'
 	abiertos db 0
@@ -43,7 +43,9 @@ inicio:
 
     lea si,entrada
     mov cx,00
-    
+             
+    pop bx
+    pop bx
     mov bx, 0
 
     analizar:
@@ -52,24 +54,24 @@ inicio:
     jz fin ;deja de contar los caracteres
     inc cx
     inc si
-    cmp al, abierto
+    cmp al, 28h
     jz acumula_abiertos
-    cmp al, cerrado
+    cmp al, 29h
     jz extrae_abiertos
     jmp analizar
 
 
     acumula_abiertos:
-    mov bl, abierto
-	push bx
+	push 28h
 	jmp analizar
 	
 
 	extrae_abiertos:
 	pop bx
-	cmp bl, abierto
+	cmp bl, 28h
 	jz analizar
 	
+	no_balanceados:
 	mov ah,09h
     lea dx, no_bal
     int 21h
@@ -78,6 +80,11 @@ inicio:
     int 21h
 
 	fin:
+	pop bx
+	cmp bl, 28h
+	jz no_balanceados
+	cmp bl, 29h
+    jz no_balanceados
 	mov ah,09h
     lea dx, bal
     int 21h
