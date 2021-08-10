@@ -28,8 +28,30 @@ convierte_numero_introducido: macro
     
     mov cl,cuadrado  
     mov ch,0 
-    mov si,0    
-endm 
+    mov si,1    
+endm
+
+;Borramos el archivo y creamos uno nuevo vacio
+Inicializa_archivo macro
+    mov ah, 41H                   ; Procedimiento para eliminar un archivo
+    lea dx, archivo
+    int 21H
+    jc salir
+    
+    mov cx, 0                     ; 0H Archivo Normal
+                                  ; 1H Solo Lectura
+                                  ; 2H Archivo Oculto
+                                  ; 3H Archivo de sistema
+    lea dx, archivo  
+    mov ah, 3CH
+    int 21h                       ; Devuelve en ax el handler del archivo / Codigo de error en ax y Flag Carry en 1 
+    jc salir
+    
+    mov nuevo_index, 0
+    
+endm
+
+
 
 
 leer: macro 
@@ -70,8 +92,11 @@ endm
    resultados db 200 dup(?)
    opcion dw ?
    vec db 50 dup('?')
-   nombreArchivo db "datos.txt", 0  
+   archivo db "datos.txt", 0  
    cero db "0"
+   
+   index db 0
+   nuevo_index db 0
    
    dataTam=$-offset data  
    mensaje db 13,10, "Ingresa el numero del cuadro magico:  ", '$'   
@@ -81,7 +106,7 @@ endm
    espacio db ?, "$"           
    salto db 13,10,"",, "$"          
             
-            
+   handle dw ?         
             
  .code  
   
@@ -95,6 +120,36 @@ endm
   
     Ingresar_Numero     
 
+    ;9   1   6
+    ;7   8   2
+    ;5   4   3
+    
+    Inicializa_archivo
+    
+
+    Resuelve_Cuadro:
+    
+    mov ah, 3DH                   ; Abrir archivo
+    mov al, 2                     ; modo de lectura / escritura
+    lea dx, archivo
+    int 21h
+    jc salir
+    mov handle, ax
+    xor ax, ax
+    
+    
+    
+    
+    loop Resuelve_Cuadro
+    
+    
+    
+    
+    
+    
+    
+    
+    
      
     ; Las posibles posiciones a ocupar se inicializan con 0
     Inicializa_Arreglo: 
