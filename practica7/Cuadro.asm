@@ -5,30 +5,30 @@
 .data
      
      
-   posicion db ?
-   casilla  db 9 dup (?)
+   ;posicion db ?
+   casillas db 9 dup (0)
    cuadrado db ? 
-   valorPrueba db ? 
-   valorCasilla db ?
-   valor db ?
-   contador db ?
-   resultados db 200 dup(?)
-   opcion dw ?
-   vec db 50 dup('?')
+   ;valorPrueba db ? 
+   ;valorCasilla db ?
+   ;valor db ?
+   ;contador db ?
+   ;resultados db 200 dup(?)
+   ;opcion dw ?
+   ;vec db 50 dup('?')
    archivo db "datos.txt", 0  
-   cero db "0"
+   ;cero db "0"
    
    incremento db 0
    index db 0
    nuevo_index db 0
    
-   dataTam=$-offset data  
+   ;dataTam=$-offset data  
    mensaje db 13,10, "Ingresa el numero del cuadro magico:  ", '$'   
             
    numero db ?          
    datos db ?, "$"        
    espacio db ?, "$"           
-   salto db 13,10,"",, "$"          
+   ;salto db 13,10,"",, "$"          
             
    handle dw ?         
             
@@ -76,8 +76,9 @@
             
     mov ch,0        
     mov cl,cuadrado      
-    mov si,1    
-    endm
+    mov al,1
+    mov index, al    
+    ;endm
 
     ;Borramos el archivo y creamos uno nuevo vacio
     ;Inicializa_archivo macro
@@ -101,40 +102,65 @@
     
     ;Inicializa_archivo
     
-    
-    
+    ;mov cl, cuadrado
+    ;mov ch, 00
 
-    Resuelve_Cuadro:
-    mov ah, 3DH                   ; Abrir archivo
-    mov al, 2                     ; modo de lectura / escritura
-    lea dx, archivo
-    int 21h
-    jc salir
-    mov handle, ax
-    xor ax, ax
-    
-    cmp si, 1
-    jz primer_index
-    jmp sigue   
-    primer_index:
+    ;cmp si, 1
+    ;jz primer_index
+    ;jmp sigue   
+    ;primer_index:
     mov al, numero
     inc al
     mov bl, 2
     div bl
-    mov casillas[ax], si
-    jmp analiza_ciclo
+    mov bx, ax
+    mov nuevo_index, bl
+    lea di, casillas
+    sub bl, index
+    add di, bx
+    mov al, index
+    mov [di], al 
+    jmp salto_ordinario
     
-    
-    sigue:
-    mov al, si
-    div numero 
+    Resuelve_Cuadro:
+    mov al, nuevo_index
+    add al, incremento
+    mov nuevo_index, al
+    ;AQUI SE PONE EL INCREMENTO PENDIENTE CUANDO SE REGRESA EL INDEX DEL ARREGLO A 1
+    ;add al, nuevo_index    ;aqui al es el incremento a dar cuando se repita el ciclo
+    ;cmp al, cuadrado
+    ;jc acciona_incremento    ; si sumados el nuevo index y el aumento es mayor que el cuadrado entonces se decuenta la diferencia al límite y comienza a contar el index de [di] en 1
+    ;sub al, cuadrado
+    ;mov ch, 00
+    ;mov cl, nuevo_index
+    ;mov incremento, al          ;"Incremento pendiente"
+    ;regresa_index_arreglo:
+    ;dec di   
+    ;loop regresa_index_arreglo
+    ;mov nuevo_index, 0
+    mov ah, 00
+    add di, ax 
+    mov al, index
+    sub di, ax     
+    mov [di], al
+    mov bl, numero
+    mov bh, 00
+    xor dx, dx
+    div bx 
     cmp dx, 0
-    jz index_multiplo_numero
+    jz index_multiplo_numero 
+    mov ax, 0000
+    mov al, nuevo_index
+    xor dx, dx
+    div numero
+    cmp dx, 0
+    jz nuevo_index_multiplo_numero
+    jmp salto_ordinario 
     
-    
-    index_multiplo_numero:
-    mov incremento, numero
-    jmp analiza_cilo
+    index_multiplo_numero: 
+    mov al, numero
+    mov incremento, al
+    jmp analiza_ciclo
     
     nuevo_index_multiplo_numero:
     mov al, cuadrado
@@ -143,28 +169,40 @@
     sub al, bl
     sub al, numero
     mov incremento, al
-    jmp analiza_cilo
+    ;mov si, index
+    ;mov casillas[ax], si
+    jmp analiza_ciclo
     
-    ordinario:
+    salto_ordinario:
+    ;mov nuevo_index, al
     mov al, cuadrado
     mov bl, numero
     dec bl
     sub al, bl
     mov incremento, al
-    jmp analiza_cilo
+    jmp analiza_ciclo
     
     
     analiza_ciclo:
-    mov cl, cuadrado
-    mov ch, 00 
     
-    inc si
-    mov ah, 3eh
-    int 21h     
-    cmp si, cx
-    jz completado
-    jmp Resuelve_Cuadro
     
+    ;acciona_incremento:
+    inc index
+    mov cl, cuadrado     
+    cmp cl, index
+    jc completado
+    jnc Resuelve_Cuadro
+    
+    
+    
+    Abrir_archivo:
+    mov ah, 3DH                   ; Abrir archivo
+    mov al, 2                     ; modo de lectura / escritura
+    lea dx, archivo
+    int 21h
+    jc salir
+    mov handle, ax
+    xor ax, ax
     
     Escribir_archivo:
     add ax, 30h   
@@ -172,6 +210,11 @@
     mov ah, 40h
     mov bx, handle
     mov cx, 1
+    int 21h
+    
+    
+    Cerrar_archivo:
+    mov ah, 3eh
     int 21h
     
     
