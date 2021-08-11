@@ -17,9 +17,17 @@
    digitos dw ?, "$"        
    espacio db ?, "$"                   
    digitos_casilla_actual db ?, "$" 
-   basura1 dw ?        
+   basura1 dw ?
+   basura2 dw ?
+   basura3 dw ?
+   basura4 dw ?
+   basura5 dw ?
+   basura6 dw ?
+   basura7 dw ?
+   basura8 dw ?
+           
    handle dw ?
-   basura2 dw ?         
+   basura10 dw ?         
             
  .code  
     mov ah,09 
@@ -171,6 +179,8 @@
     inc di
     
     ;mov cl, cuadrado
+    xor cx, cx
+    mov digitos, cx
     mov index, 1
     Convertir_una_casilla:
     xor cx, cx
@@ -186,31 +196,36 @@
     mov bx, 100
     div bx
     add ax, 30h
-    push ax
+    acomoda_decimal
     mov ax, dx
     xor dx, dx
-    inc cx
     jmp Conversion_a_ascii
     
     menor_a_100:
     mov bx, 10
     div bx
     add ax, 30h
-    push ax
+
+    acomoda_decimal
     mov ax, dx
     xor dx, dx
-    inc cx
     jmp Conversion_a_ascii
  
     menor_a_10:
     add ax, 30h
-    push ax
-    inc cx
-    mov digitos, cx
+
+    acomoda_decimal
+       
+       
     
     
+    acomoda_decimal macro
     xor si, si
     mov si, digitos
+    mov digitos_casilla_actual[si], al
+    inc digitos
+    endm
+    
     ;AQUI SE AGREGA EL TAB(09H) O SALDO DE LINEA(0DH)
     ;xor dx, dx
     mov al, index
@@ -222,28 +237,41 @@
     ;inc si
     ;mov digitos_casilla_actual[si], 2ch
     ;dec si
-    mov digitos_casilla_actual[si], 09h
+    mov al, 09h
+    acomoda_decimal
+    ;mov digitos_casilla_actual[si], 09h
     jmp continua
     
     salto_linea:
     ;inc si
     ;mov digitos_casilla_actual[si], 2ch
     ;dec si
-    mov digitos_casilla_actual[si], 0dh
+    ;mov digitos_casilla_actual[si], 0dh
+    mov al, 0dh
+    acomoda_decimal
     
     continua:   
-    dec si
-    acomoda_decimal:
-    pop ax
-    mov digitos_casilla_actual[si], al
-    dec si
-    loop acomoda_decimal
+    ;dec si
+    
     ;inc si
     
-    xor si, si
-    mov cl, index
-    mov si, cx
+    ;xor si, si
+    ;mov cl, index
+    ;mov si, cx
+    
+    xor cx, cx
+    mov cl, cuadrado
+    dec cuadrado
+    inc di
+    inc index
+    loop Convertir_una_casilla
+    
+    ;ARCHIVO:
     Abrir_archivo:
+    xor ax, ax
+    xor bx, bx
+    xor cx, cx
+    xor dx, dx
     mov ah, 3DH                   ; Abrir archivo
     mov al, 1                     ; modo de lectura / escritura
     lea dx, archivo
@@ -267,13 +295,6 @@
     Cerrar_archivo:
     mov ah, 3eh
     int 21h 
-    
-    xor cx, cx
-    mov cl, cuadrado
-    dec cuadrado
-    inc di
-    inc index
-    loop Convertir_una_casilla
     
     
     
