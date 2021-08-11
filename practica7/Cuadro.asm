@@ -4,13 +4,14 @@
  
 .data
      
-   casillas db 9 dup (0)
+   casillas db 25 dup (0)
    cuadrado db ? 
    archivo db "datos.txt", 0  
    
    incremento db 0
    index db 0
    nuevo_index db 0
+   viejo_index db 0
      
    mensaje db 13,10, "Ingresa el numero del cuadro magico:  ", '$'   
             
@@ -88,6 +89,7 @@
     
     Resuelve_Cuadro:
     mov al, nuevo_index
+    mov viejo_index, al
     add al, incremento
     mov nuevo_index, al
     ;AQUI SE PONE EL INCREMENTO PENDIENTE CUANDO SE REGRESA EL INDEX DEL ARREGLO A 1
@@ -97,7 +99,7 @@
     jnc sigue    ; si sumados el nuevo index y el aumento es mayor que el cuadrado entonces se descuenta la diferencia al limite y comienza a contar el index de [di] en 1
     sub al, cuadrado
     mov ch, 00
-    mov cl, cuadrado
+    mov cl, viejo_index
     mov incremento, al          ;"Incremento pendiente"
     regresa_index_arreglo:
     dec di   
@@ -112,8 +114,9 @@
     sigue:
     mov ah, 00
     add di, ax 
-    mov al, index
-    sub di, ax     
+    mov al, viejo_index
+    sub di, ax
+    mov al, index     
     mov [di], al
     compara_multiplo:
     mov bl, numero
@@ -125,7 +128,8 @@
     mov ax, 0000
     mov al, nuevo_index
     xor dx, dx
-    div numero
+    mov bl, numero
+    div bx
     cmp dx, 0
     jz nuevo_index_multiplo_numero
     jmp salto_ordinario 
