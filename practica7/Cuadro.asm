@@ -1,9 +1,7 @@
  name "Cuadro Magico"    
  org 100h
 
- 
 .data
-     
    casillas db 25 dup (0)
    cuadrado db ? 
    archivo db "datos.txt", 0  
@@ -16,13 +14,14 @@
    mensaje db 13,10, "Ingresa el numero del cuadro magico:  ", '$'   
             
    numero db ?          
-   datos db ?, "$"        
+   digitos dw ?, "$"        
    espacio db ?, "$"                   
-            
-   handle dw ?         
+   digitos_casilla_actual db ?, "$" 
+   basura1 dw ?        
+   handle dw ?
+   basura2 dw ?         
             
  .code  
-  
     mov ah,09 
     lea dx, mensaje
     int 21h 
@@ -59,19 +58,6 @@
     mov al,1
     mov index, al    
     
-    
-    ;Borramos el archivo y creamos uno nuevo vacio
-    mov ah, 41H                   ; Procedimiento para eliminar un archivo
-    lea dx, archivo
-    int 21H
-    jc salir
-    
-    mov cx, 0  ; 0H Archivo Normal ; 1H Solo Lectura ; 2H Archivo Oculto ; 3H Archivo de sistema
-    lea dx, archivo  
-    mov ah, 3CH
-    int 21h                       ; Devuelve en ax el handler del archivo / Codigo de error en ax y Flag Carry en 1 
-    jc salir
-    
     mov nuevo_index, 1
     
     mov al, numero
@@ -107,7 +93,6 @@
     mov nuevo_index, 1
     add di, ax   
     mov nuevo_index, al
-    ;sub di, ax
     mov al, index
     mov [di], al
     jmp compara_multiplo
@@ -146,12 +131,9 @@
     sub al, bl
     sub al, numero
     mov incremento, al
-    ;mov si, index
-    ;mov casillas[ax], si
     jmp analiza_ciclo
     
     salto_ordinario:
-    ;mov nuevo_index, al
     mov al, cuadrado
     mov bl, numero
     dec bl
@@ -161,38 +143,137 @@
     
     
     analiza_ciclo:
-    
-    
-    ;acciona_incremento:
     inc index
     mov cl, cuadrado     
     cmp cl, index
-    jc completado
+    jc Cuadro_completado
     jnc Resuelve_Cuadro
     
     
+    Cuadro_completado:
+    ;Borramos el archivo y creamos uno nuevo vacio
+    mov ah, 41H                   ; Procedimiento para eliminar un archivo
+    lea dx, archivo
+    int 21H
+    jc salir
     
+    mov cx, 0  ; 0H Archivo Normal ; 1H Solo Lectura ; 2H Archivo Oculto ; 3H Archivo de sistema
+    lea dx, archivo  
+    mov ah, 3CH
+    int 21h                       ; Devuelve en ax el handler del archivo / Codigo de error en ax y Flag Carry en 1 
+    jc salir
+      
+    mov ch, 00
+    mov cl, nuevo_index
+    regresa_index_arreglo_para_imprimir:
+    dec di   
+    loop regresa_index_arreglo_para_imprimir
+    inc di
+    
+    ;mov cl, cuadrado
+    mov index, 1
+    Convertir_una_casilla:
+    xor cx, cx
+    mov dl, [di]
+    mov al, dl
+    xor dx, dx
+    Conversion_a_ascii: 
+    cmp al, 10
+    jc menor_a_10
+    cmp al, 100
+    jc menor_a_100
+    mayor_a_100:
+    mov bx, 100
+    div bx
+    add ax, 30h
+    push ax
+    mov ax, dx
+    xor dx, dx
+    inc cx
+    jmp Conversion_a_ascii
+    
+    menor_a_100:
+    mov bx, 10
+    div bx
+    add ax, 30h
+    push ax
+    mov ax, dx
+    xor dx, dx
+    inc cx
+    jmp Conversion_a_ascii
+ 
+    menor_a_10:
+    add ax, 30h
+    push ax
+    inc cx
+    mov digitos, cx
+    
+    
+    xor si, si
+    mov si, digitos
+    ;AQUI SE AGREGA EL TAB(09H) O SALDO DE LINEA(0DH)
+    ;xor dx, dx
+    mov al, index
+    mov bl, numero
+    div bx
+    cmp dx, 0
+    jz salto_linea
+    tab:
+    ;inc si
+    ;mov digitos_casilla_actual[si], 2ch
+    ;dec si
+    mov digitos_casilla_actual[si], 09h
+    jmp continua
+    
+    salto_linea:
+    ;inc si
+    ;mov digitos_casilla_actual[si], 2ch
+    ;dec si
+    mov digitos_casilla_actual[si], 0dh
+    
+    continua:   
+    dec si
+    acomoda_decimal:
+    pop ax
+    mov digitos_casilla_actual[si], al
+    dec si
+    loop acomoda_decimal
+    ;inc si
+    
+    xor si, si
+    mov cl, index
+    mov si, cx
     Abrir_archivo:
     mov ah, 3DH                   ; Abrir archivo
-    mov al, 2                     ; modo de lectura / escritura
+    mov al, 1                     ; modo de lectura / escritura
     lea dx, archivo
     int 21h
     jc salir
     mov handle, ax
     xor ax, ax
+       
     
     Escribir_archivo:
-    add ax, 30h   
-    mov dx, ax 
+    inc digitos
+    xor dx, dx 
     mov ah, 40h
     mov bx, handle
-    mov cx, 1
+    mov cx, digitos
+    lea dx, digitos_casilla_actual
+    ;lea dx, casillas
     int 21h
     
     
     Cerrar_archivo:
     mov ah, 3eh
-    int 21h
+    int 21h 
+    
+    xor cx, cx
+    mov cl, cuadrado
+    dec cuadrado
+    inc di
+    inc index
+    loop Convertir_una_casilla
     
     
     
@@ -200,7 +281,7 @@
     int 21h
     
     
-    completado:
+    
     salir:
     
      
