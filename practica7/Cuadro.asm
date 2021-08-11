@@ -4,31 +4,19 @@
  
 .data
      
-     
-   ;posicion db ?
    casillas db 9 dup (0)
    cuadrado db ? 
-   ;valorPrueba db ? 
-   ;valorCasilla db ?
-   ;valor db ?
-   ;contador db ?
-   ;resultados db 200 dup(?)
-   ;opcion dw ?
-   ;vec db 50 dup('?')
    archivo db "datos.txt", 0  
-   ;cero db "0"
    
    incremento db 0
    index db 0
    nuevo_index db 0
-   
-   ;dataTam=$-offset data  
+     
    mensaje db 13,10, "Ingresa el numero del cuadro magico:  ", '$'   
             
    numero db ?          
    datos db ?, "$"        
-   espacio db ?, "$"           
-   ;salto db 13,10,"",, "$"          
+   espacio db ?, "$"                   
             
    handle dw ?         
             
@@ -42,13 +30,6 @@
     lea SI, numero
     mov cx, 50
   
-    ;Ingresar_Numero     
-
-    ;9   1   6
-    ;7   8   2
-    ;5   4   3
-    
-    ;Ingresar_Numero macro
     puntero_lector:
     mov ah,01h
     int 21h
@@ -58,7 +39,6 @@
     inc si
     inc bx
     loop puntero_lector          
-    ;endm
 
 
     ;Funcion para convertir ASCII a hexadecimal y obtencion del cuadrado
@@ -68,7 +48,6 @@
     mov al,numero
     mul numero
     mov cuadrado,al
-  
          
     mov ah,00h 
     mov al,03h
@@ -78,19 +57,15 @@
     mov cl,cuadrado      
     mov al,1
     mov index, al    
-    ;endm
-
+    
+    
     ;Borramos el archivo y creamos uno nuevo vacio
-    ;Inicializa_archivo macro
     mov ah, 41H                   ; Procedimiento para eliminar un archivo
     lea dx, archivo
     int 21H
     jc salir
     
-    mov cx, 0                     ; 0H Archivo Normal
-                                  ; 1H Solo Lectura
-                                  ; 2H Archivo Oculto
-                                  ; 3H Archivo de sistema
+    mov cx, 0  ; 0H Archivo Normal ; 1H Solo Lectura ; 2H Archivo Oculto ; 3H Archivo de sistema
     lea dx, archivo  
     mov ah, 3CH
     int 21h                       ; Devuelve en ax el handler del archivo / Codigo de error en ax y Flag Carry en 1 
@@ -98,17 +73,6 @@
     
     mov nuevo_index, 1
     
-    ;endm
-    
-    ;Inicializa_archivo
-    
-    ;mov cl, cuadrado
-    ;mov ch, 00
-
-    ;cmp si, 1
-    ;jz primer_index
-    ;jmp sigue   
-    ;primer_index:
     mov al, numero
     inc al
     mov bl, 2
@@ -127,22 +91,31 @@
     add al, incremento
     mov nuevo_index, al
     ;AQUI SE PONE EL INCREMENTO PENDIENTE CUANDO SE REGRESA EL INDEX DEL ARREGLO A 1
+    
     ;add al, nuevo_index    ;aqui al es el incremento a dar cuando se repita el ciclo
-    ;cmp al, cuadrado
-    ;jc acciona_incremento    ; si sumados el nuevo index y el aumento es mayor que el cuadrado entonces se decuenta la diferencia al límite y comienza a contar el index de [di] en 1
-    ;sub al, cuadrado
-    ;mov ch, 00
-    ;mov cl, nuevo_index
-    ;mov incremento, al          ;"Incremento pendiente"
-    ;regresa_index_arreglo:
-    ;dec di   
-    ;loop regresa_index_arreglo
-    ;mov nuevo_index, 0
+    cmp cuadrado, al
+    jnc sigue    ; si sumados el nuevo index y el aumento es mayor que el cuadrado entonces se descuenta la diferencia al limite y comienza a contar el index de [di] en 1
+    sub al, cuadrado
+    mov ch, 00
+    mov cl, cuadrado
+    mov incremento, al          ;"Incremento pendiente"
+    regresa_index_arreglo:
+    dec di   
+    loop regresa_index_arreglo
+    mov nuevo_index, 1
+    add di, ax   
+    mov nuevo_index, al
+    ;sub di, ax
+    mov al, index
+    mov [di], al
+    jmp compara_multiplo
+    sigue:
     mov ah, 00
     add di, ax 
     mov al, index
     sub di, ax     
     mov [di], al
+    compara_multiplo:
     mov bl, numero
     mov bh, 00
     xor dx, dx
