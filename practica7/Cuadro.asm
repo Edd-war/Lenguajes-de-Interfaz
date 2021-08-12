@@ -1,8 +1,15 @@
  name "Cuadro Magico"    
  org 100h
 
+acomoda_decimal macro
+    xor si, si
+    mov si, digitos
+    mov digitos_casilla_actual[si], al
+    inc digitos
+endm
+
 .data
-   casillas db 25 dup (0)
+   casillas db 441 dup ("$")
    cuadrado db ? 
    archivo db "datos.txt", 0  
    
@@ -16,17 +23,9 @@
    numero db ?          
    digitos dw ?, "$"        
    espacio db ?, "$"                   
-   digitos_casilla_actual db ?, "$" 
-   basura1 dw ?
-   basura2 dw ?
-   basura3 dw ?
-   basura4 dw ?
-   basura5 dw ?
-   basura6 dw ?
-   basura7 dw ?
-   basura8 dw ?
-           
+  
    handle dw ?
+   digitos_casilla_actual db 1665 dup("$")
    basura10 dw ?         
             
  .code  
@@ -46,14 +45,24 @@
     mov [si],al
     inc si
     inc bx
-    loop puntero_lector          
-
-
+    cmp bx, 2
+    mov ah, 00
+    jnz puntero_lector          
+    sub al, 30h
+    sub numero, 30h
+    xchg al, numero
+    mov bx, 10
+    mul bx
+    add al, numero
+    mov numero, al
+    jmp saca_cuadrado
+    
     ;Funcion para convertir ASCII a hexadecimal y obtencion del cuadrado
     ;convierte_numero_introducido: macro
 	convierte_numero_introducido:
 	sub numero, 30h        
     mov al,numero
+    saca_cuadrado:
     mul numero
     mov cuadrado,al
          
@@ -87,8 +96,7 @@
     add al, incremento
     mov nuevo_index, al
     ;AQUI SE PONE EL INCREMENTO PENDIENTE CUANDO SE REGRESA EL INDEX DEL ARREGLO A 1
-    
-    ;add al, nuevo_index    ;aqui al es el incremento a dar cuando se repita el ciclo
+ 
     cmp cuadrado, al
     jnc sigue    ; si sumados el nuevo index y el aumento es mayor que el cuadrado entonces se descuenta la diferencia al limite y comienza a contar el index de [di] en 1
     sub al, cuadrado
@@ -149,14 +157,12 @@
     mov incremento, al
     jmp analiza_ciclo
     
-    
     analiza_ciclo:
     inc index
     mov cl, cuadrado     
     cmp cl, index
     jc Cuadro_completado
     jnc Resuelve_Cuadro
-    
     
     Cuadro_completado:
     ;Borramos el archivo y creamos uno nuevo vacio
@@ -178,7 +184,6 @@
     loop regresa_index_arreglo_para_imprimir
     inc di
     
-    ;mov cl, cuadrado
     xor cx, cx
     mov digitos, cx
     mov index, 1
@@ -215,50 +220,23 @@
     add ax, 30h
 
     acomoda_decimal
-       
-       
-    
-    
-    acomoda_decimal macro
-    xor si, si
-    mov si, digitos
-    mov digitos_casilla_actual[si], al
-    inc digitos
-    endm
     
     ;AQUI SE AGREGA EL TAB(09H) O SALDO DE LINEA(0DH)
-    ;xor dx, dx
     mov al, index
     mov bl, numero
     div bx
     cmp dx, 0
     jz salto_linea
     tab:
-    ;inc si
-    ;mov digitos_casilla_actual[si], 2ch
-    ;dec si
     mov al, 09h
     acomoda_decimal
-    ;mov digitos_casilla_actual[si], 09h
     jmp continua
     
     salto_linea:
-    ;inc si
-    ;mov digitos_casilla_actual[si], 2ch
-    ;dec si
-    ;mov digitos_casilla_actual[si], 0dh
     mov al, 0dh
     acomoda_decimal
     
     continua:   
-    ;dec si
-    
-    ;inc si
-    
-    ;xor si, si
-    ;mov cl, index
-    ;mov si, cx
-    
     xor cx, cx
     mov cl, cuadrado
     dec cuadrado
@@ -266,7 +244,6 @@
     inc index
     loop Convertir_una_casilla
     
-    ;ARCHIVO:
     Abrir_archivo:
     xor ax, ax
     xor bx, bx
@@ -278,8 +255,7 @@
     int 21h
     jc salir
     mov handle, ax
-    xor ax, ax
-       
+    xor ax, ax   
     
     Escribir_archivo:
     inc digitos
@@ -288,21 +264,12 @@
     mov bx, handle
     mov cx, digitos
     lea dx, digitos_casilla_actual
-    ;lea dx, casillas
     int 21h
-    
     
     Cerrar_archivo:
     mov ah, 3eh
     int 21h 
     
-    
-    
+    salir:
     mov ax, 4C00h
     int 21h
-    
-    
-    
-    salir:
-    
-     
